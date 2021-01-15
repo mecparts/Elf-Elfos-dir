@@ -282,7 +282,7 @@ displp:    ldn     rf                  ; see if done with list
            lbz     complete            ; jump if done
            push    rf                  ; save position
            sep     scall               ; display current filename
-           dw      f_msg
+           dw      o_msg
            glo     rb                  ; get mode byte
            shr                         ; shift long/short into df
            lbdf    longdsp             ; jump if long display
@@ -290,7 +290,7 @@ displp:    ldn     rf                  ; see if done with list
            glo     rc                  ; see if zero
            lbnz    short               ; jump if not
            sep     scall               ; do a cr/lf
-           dw      f_inmsg
+           dw      o_inmsg
            db      10,13,0
            ldi     4                   ; reset counter
            plo     rc
@@ -309,7 +309,7 @@ longdsp:   pop     rf
            dw      datetime
            mov     rf,buffer           ; point back to buffer
            sep     scall               ; and display it
-           dw      f_msg
+           dw      o_msg
            pop     rf                  ; recover dirent pointer
            glo     rf                  ; move to size
            adi     26
@@ -1098,7 +1098,7 @@ loop1:     lda     rf
            ldn     r2           ; recover character
 itoa2:     adi     030h
            sep     scall
-           dw      f_type
+           dw      o_type
 itoa3:     dec     r8
            glo     r8
            lbnz    loop1
@@ -1118,7 +1118,7 @@ itoaz:     ghi     r8           ; see if leading have been used up
            lbr     itoa3        ; and loop for next character
 itoan:     ldi     '-'          ; show negative
            sep     scall
-           dw      f_type
+           dw      o_type
            glo     r8           ; 2s compliment
            xri     0ffh
            adi     1
