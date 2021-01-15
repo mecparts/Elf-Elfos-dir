@@ -298,13 +298,24 @@ displp:    ldn     rf                  ; see if done with list
 longdsp:   pop     rf
            push    rf                  ; save position
            push    rf
-           glo     rf                  ; point to date/time
-           adi     22
+           glo     rf                  ; point to flags/date/time
+           adi     21
            plo     ra
            ghi     rf
            adci    0
            phi     ra
-           mov     rf,buffer           ; point to buffer
+
+           lda     ra                  ; get flags
+           ani     2                   ; is file executable
+           lbz     longdsp2            ; jump if not
+           sep     scall               ; show as executable
+           dw      o_inmsg
+           db      '* ',0
+           lbr     longdsp3
+longdsp2:  sep     scall               ; non executable
+           dw      o_inmsg
+           db      '  ',0
+longdsp3:  mov     rf,buffer           ; point to buffer
            sep     scall               ; convert datetime
            dw      datetime
            mov     rf,buffer           ; point back to buffer
