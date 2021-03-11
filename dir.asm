@@ -9,6 +9,7 @@
 ; Mode bits:
 ;   0 - 0=short display
 ;       1=long display      -l    (shows date and size)
+;   1 - 1=show hidden files
 ;   3 - 1=sort
 ;   4 - 1=descending        -r
 ;   5 - sort on size        -s
@@ -93,9 +94,16 @@ not_s:     glo     re                  ; recover byte
            lbr     sw_lp               ; check for more switches
 not_d:     glo     re                  ; recover character
            smi     'n'                 ; check sort by name
-           lbnz    sw_lp               ; if not, then not a valid switch
+           lbnz    not_n               ; if not, then not a valid switch
            glo     r9                  ; get modes
            ori     088h                ; turn on sort by name
+           plo     r9
+           lbr     sw_lp               ; loop back for more switches
+not_n:     glo     re                  ; recover character
+           smi     'h'                 ; check show hidden files
+           lbnz    sw_lp               ; if not, then not a valid switch
+           glo     r9                  ; get modes
+           ori     02h                 ; turn on show hidden files
            plo     r9
            lbr     sw_lp               ; loop back for more switches
 no_sw:     mov     rb,mode             ; point to modes variable
@@ -134,7 +142,17 @@ dirloop:   ldi     0                   ; need to read 32 bytes
 ; *************************************************************
 ; *** Good entry found, copy needed data to dirents storage ***
 ; *************************************************************
-dirgood:   mov     rf,next             ; need to retrieve next pointer
+dirgood:   mov     rf,buffer+6         ; point to flags byte
+           ldn     rf                  ; retrieve it
+           ani     8                   ; check hidden bit
+           lbz     nothidden           ; jump if file is not hidden
+           mov     rf,mode             ; point to modes
+           ldn     rf                  ; retrieve modes
+           ani     2                   ; see if show hidden is on
+           lbnz    nothidden           ; show if -h was specified
+           lbr     dirloop             ; otherwise do not show it
+
+nothidden: mov     rf,next             ; need to retrieve next pointer
            lda     rf                  ; put into rc
            phi     rc
            ldn     rf
