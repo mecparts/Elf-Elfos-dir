@@ -764,13 +764,13 @@ notdir:    ldi     ' '                 ; trailing space
            dw      docrlf
            ldi     0                   ; set new terminal width
            plo     r7
-           br      dirloop             ; loop back for next entry
+           lbr     dirloop             ; loop back for next entry
 term_lp:   glo     r7                  ; get terminal width
            ani     15                  ; uses 16 as tabstop
            bnz     notdir              ; jump if not at tabstop
            ldn     rb                  ; get mode
            bnz     long                ; jump if long mode
-           br      dirloop             ; loop for next entry
+           lbr     dirloop             ; loop for next entry
 long:      ldi     low buffer          ; point to directory entry
            adi     7                   ; date field
            plo     ra
